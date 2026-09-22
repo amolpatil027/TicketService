@@ -1,5 +1,6 @@
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
+using TicketAgeApi.Exceptions;
 using TicketAgeApi.Models;
 using TicketAgeApi.Services;
 
@@ -22,7 +23,7 @@ public sealed class TicketsController : ControllerBase
     public async Task<IActionResult> Import([FromForm] List<IFormFile> files)
     {
         if (files is null || files.Count == 0)
-            return BadRequest("Upload at least one .xlsx file.");
+            throw new BadRequestException("Upload at least one .xlsx file.");
 
         var results = new List<object>();
         var importedRows = 0;
@@ -30,10 +31,10 @@ public sealed class TicketsController : ControllerBase
         foreach (var file in files)
         {
             if (file.Length == 0)
-                return BadRequest($"File '{file.FileName}' is empty.");
+                throw new BadRequestException($"File '{file.FileName}' is empty.");
 
             if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
-                return BadRequest($"File '{file.FileName}' is not an .xlsx file.");
+                throw new BadRequestException($"File '{file.FileName}' is not an .xlsx file.");
 
             try
             {
